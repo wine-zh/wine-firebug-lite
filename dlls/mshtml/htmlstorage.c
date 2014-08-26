@@ -152,8 +152,33 @@ static HRESULT WINAPI HTMLStorage_key(IHTMLStorage *iface, LONG lIndex, BSTR *p)
 static HRESULT WINAPI HTMLStorage_getItem(IHTMLStorage *iface, BSTR bstrKey, VARIANT *p)
 {
     HTMLStorage *This = impl_from_IHTMLStorage(iface);
-    FIXME("(%p)->(%s %p)\n", This, debugstr_w(bstrKey), p);
-    return E_NOTIMPL;
+    nsAString key, value;
+    PRUnichar *pval;
+    nsresult nsres;
+
+    TRACE("(%p)->(%s %p)\n", This, debugstr_w(bstrKey), p);
+
+    nsAString_InitDepend(&key, bstrKey);
+    nsAString_Init(&value, NULL);
+
+    nsres = nsIDOMStorage_GetItem(This->nsstorage, &key, &value);
+    nsAString_Finish(&key);
+    if (NS_FAILED(nsres)) {
+        ERR("GetItem failed: %08x\n", nsres);
+        V_VT(p) = VT_NULL;
+        return E_FAIL;
+    }
+
+    nsAString_GetData(&value, &pval);
+    if(*pval) {
+        V_VT(p) = VT_BSTR;
+        V_BSTR(p) = SysAllocString(pval);
+    }else {
+        V_VT(p) = VT_NULL;
+    }
+    nsAString_Finish(&value);
+
+    return S_OK;
 }
 
 static HRESULT WINAPI HTMLStorage_setItem(IHTMLStorage *iface, BSTR bstrKey, BSTR bstrValue)
