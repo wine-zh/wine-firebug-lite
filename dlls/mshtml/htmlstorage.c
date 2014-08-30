@@ -17,6 +17,7 @@
  */
 
 #include <stdarg.h>
+#include <assert.h>
 
 #define COBJMACROS
 
@@ -84,6 +85,10 @@ static ULONG WINAPI HTMLStorage_Release(IHTMLStorage *iface)
     TRACE("(%p) ref=%d\n", This, ref);
 
     if(!ref) {
+        if (This->nsstorage)
+            nsIDOMStorage_Release(This->nsstorage);
+        assert(This->self_ref && *This->self_ref);
+        *This->self_ref = NULL;
         release_dispex(&This->dispex);
         heap_free(This);
     }
