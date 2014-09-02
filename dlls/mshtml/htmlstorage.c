@@ -34,6 +34,8 @@ WINE_DEFAULT_DEBUG_CHANNEL(mshtml);
 typedef struct {
     DispatchEx dispex;
     IHTMLStorage IHTMLStorage_iface;
+    nsIDOMStorage *nsstorage;
+    IHTMLStorage **self_ref;
     LONG ref;
 } HTMLStorage;
 
@@ -198,7 +200,7 @@ static dispex_static_data_t HTMLStorage_dispex = {
     HTMLStorage_iface_tids
 };
 
-HRESULT create_storage(IHTMLStorage **p)
+HRESULT create_storage(nsIDOMStorage *created, IHTMLStorage **p)
 {
     HTMLStorage *storage;
 
@@ -211,5 +213,7 @@ HRESULT create_storage(IHTMLStorage **p)
     init_dispex(&storage->dispex, (IUnknown*)&storage->IHTMLStorage_iface, &HTMLStorage_dispex);
 
     *p = &storage->IHTMLStorage_iface;
+    storage->nsstorage = created;
+    storage->self_ref = p;
     return S_OK;
 }
