@@ -135,7 +135,7 @@ static HRESULT WINAPI HTMLFrameBase_put_src(IHTMLFrameBase *iface, BSTR v)
 
     if(!This->content_window || !This->element.node.doc || !This->element.node.doc->basedoc.window) {
         FIXME("detached element\n");
-        return E_FAIL;
+        return S_OK;
     }
 
     return navigate_url(This->content_window, v, This->element.node.doc->basedoc.window->uri, BINDING_NAVIGATED);
