@@ -26,6 +26,7 @@
 #include "ole2.h"
 
 #include "mshtml_private.h"
+#include "binding.h"
 
 #include "wine/debug.h"
 
@@ -536,6 +537,16 @@ static HRESULT HTMLIFrame_bind_to_tree(HTMLDOMNode *iface)
 
     hres = set_frame_doc(&This->framebase, nsdoc);
     nsIDOMDocument_Release(nsdoc);
+
+    if(FAILED(hres))
+        return hres;
+    if(This->framebase.navigate_on_bind == TRUE)
+    {
+        hres = navigate_url(This->framebase.content_window, This->framebase.src,
+                     This->framebase.element.node.doc->basedoc.window->uri, BINDING_NAVIGATED);
+        This->framebase.navigate_on_bind = FALSE;
+    }
+
     return hres;
 }
 

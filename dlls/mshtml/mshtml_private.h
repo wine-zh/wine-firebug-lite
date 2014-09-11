@@ -712,6 +712,8 @@ struct HTMLFrameBase {
 
     nsIDOMHTMLFrameElement *nsframe;
     nsIDOMHTMLIFrameElement *nsiframe;
+    BSTR src;
+    BOOL navigate_on_bind;
 };
 
 typedef struct nsDocumentEventListener nsDocumentEventListener;
